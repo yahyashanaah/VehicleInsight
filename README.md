@@ -37,6 +37,25 @@ Available endpoints:
 
 The static frontend is served from `src/VehicleInsight.Web/wwwroot` and is available at the root URL when the app is running.
 
+## Docker Run Instructions
+
+Build and run the application from the solution root:
+
+```powershell
+docker compose up --build
+```
+
+The app will be available at:
+
+- UI: `http://localhost:8080`
+- Swagger: `http://localhost:8080/swagger`
+
+Stop the container with `Ctrl+C`, or run this from another terminal:
+
+```powershell
+docker compose down
+```
+
 ## Planned Next Steps
 
 - Add domain models for vehicle data.

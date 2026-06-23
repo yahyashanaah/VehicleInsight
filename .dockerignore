@@ -1,0 +1,16 @@
+.git
+.gitignore
+.vs
+.vscode
+.idea
+
+**/bin/
+**/obj/
+
+.runlogs/
+logs/
+*.log
+
+Dockerfile
+docker-compose.yml
+README.md
