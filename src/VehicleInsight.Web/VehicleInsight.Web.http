@@ -1,0 +1,11 @@
+@VehicleInsight.Web_HostAddress = http://localhost:5241
+
+GET {{VehicleInsight.Web_HostAddress}}/
+Accept: application/json
+
+###
+
+GET {{VehicleInsight.Web_HostAddress}}/health
+Accept: text/plain
+
+###
