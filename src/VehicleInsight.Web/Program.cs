@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.OpenApi.Models;
+using System.Net.Mime;
 using VehicleInsight.Application;
 using VehicleInsight.Infrastructure;
 using VehicleInsight.Web.Endpoints;
@@ -20,6 +22,33 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exceptionFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var logger = context.RequestServices
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("GlobalExceptionHandler");
+
+        logger.LogError(
+            exceptionFeature?.Error,
+            "An unhandled exception occurred while processing {Method} {Path}.",
+            context.Request.Method,
+            context.Request.Path);
+
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            status = StatusCodes.Status500InternalServerError,
+            title = "An unexpected error occurred.",
+            detail = "Please try again later."
+        });
+    });
+});
 
 if (app.Environment.IsDevelopment())
 {
