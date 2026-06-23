@@ -29,11 +29,13 @@ Available endpoints:
 
 - `GET /` returns the application name and version.
 - `GET /health` returns `Healthy`.
+- `GET /api/vehicles/makes` returns vehicle makes from the NHTSA Vehicle API.
+- `GET /api/vehicles/makes/{makeId}/types` returns vehicle types for a make.
+- `GET /api/vehicles/makes/{makeId}/models?year=2015` returns models for a make and model year.
 - Swagger UI is available at `/swagger` in Development.
 
 ## Planned Next Steps
 
 - Add domain models for vehicle data.
-- Add application use cases and service interfaces.
-- Add infrastructure implementations for external vehicle APIs.
 - Add endpoint tests and broader application test coverage.
+- Add richer error responses and resilience policies for external API calls.
