@@ -6,6 +6,8 @@ VehicleInsight is a .NET 8 web application for searching vehicle information fro
 
 http://13.51.175.53
 
+The deployed application is publicly available at `http://13.51.175.53`. The production EC2 instance serves the app on port `80`; local Docker instructions use port `8080`.
+
 ## Features
 
 - Clean Architecture solution structure.
@@ -133,6 +135,17 @@ Stop the container:
 docker compose down
 ```
 
+## Environment Variables
+
+The app runs with sensible defaults for local development and Docker.
+
+| Variable | Purpose | Default/Example |
+| --- | --- | --- |
+| `ASPNETCORE_ENVIRONMENT` | Controls runtime environment and Swagger availability. | `Development` for local/Docker demo |
+| `ASPNETCORE_URLS` | Configures the container listening URL. | `http://+:8080` |
+
+The NHTSA VPIC API base URL is configured in code as `https://vpic.nhtsa.dot.gov/`.
+
 ## API Endpoints
 
 - `GET /` serves the VehicleInsight search UI.
@@ -182,6 +195,14 @@ Recommended commit flow for this assignment:
 - Add CI build/test workflow.
 - Improve frontend filtering and result presentation.
 
+## Troubleshooting
+
+- If the local app does not start, confirm the .NET 8 SDK is installed and run `dotnet restore`.
+- If Docker fails to start, confirm Docker Desktop or the Docker engine is running, then retry `docker compose up --build`.
+- If `http://localhost:8080` is unavailable, check whether another process is using port `8080`.
+- If vehicle data does not load, verify internet access from the app host because the service calls the external NHTSA VPIC API.
+- If Swagger is unavailable on the live EC2 URL, use the local or Docker development URLs. Swagger is intended for development/demo environments.
+
 ## AWS Deployment
 
 AWS EC2 deployment instructions are available in [docs/deployment-aws-ec2.md](docs/deployment-aws-ec2.md).
@@ -190,4 +211,4 @@ Deployment notes:
 
 - Hosted on AWS EC2 Free Tier.
 - Dockerized and running on Ubuntu EC2.
-- Live Demo: http://13.51.175.53
+- Public URL: http://13.51.175.53
