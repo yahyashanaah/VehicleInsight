@@ -180,4 +180,6 @@ Recommended commit flow for this assignment:
 
 ## AWS Deployment
 
-AWS deployment will be added later. No AWS deployment resources or configuration are included yet.
+AWS EC2 deployment instructions are available in [docs/deployment-aws-ec2.md](docs/deployment-aws-ec2.md).
+
+No AWS infrastructure resources or automated deployment configuration are included yet.
