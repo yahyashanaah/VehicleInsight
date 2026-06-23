@@ -29,8 +29,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.MapApplicationEndpoints();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

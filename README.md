@@ -27,12 +27,15 @@ dotnet run --project src/VehicleInsight.Web
 
 Available endpoints:
 
-- `GET /` returns the application name and version.
+- `GET /` serves the VehicleInsight search UI.
+- `GET /api/app` returns the application name and version.
 - `GET /health` returns `Healthy`.
 - `GET /api/vehicles/makes` returns vehicle makes from the NHTSA Vehicle API.
 - `GET /api/vehicles/makes/{makeId}/types` returns vehicle types for a make.
 - `GET /api/vehicles/makes/{makeId}/models?year=2015` returns models for a make and model year.
 - Swagger UI is available at `/swagger` in Development.
+
+The static frontend is served from `src/VehicleInsight.Web/wwwroot` and is available at the root URL when the app is running.
 
 ## Planned Next Steps
 

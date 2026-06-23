@@ -6,7 +6,7 @@ public static class ApplicationEndpoints
 {
     public static IEndpointRouteBuilder MapApplicationEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/", () => Results.Ok(new ApplicationInfoDto("VehicleInsight", "1.0.0")))
+        app.MapGet("/api/app", () => Results.Ok(new ApplicationInfoDto("VehicleInsight", "1.0.0")))
             .WithName("GetApplicationInfo")
             .WithTags("Application");
 

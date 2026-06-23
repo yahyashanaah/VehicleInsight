@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VehicleInsight</title>
+    <link rel="stylesheet" href="/css/site.css">
+</head>
+<body>
+    <main class="page-shell">
+        <section class="intro">
+            <p class="eyebrow">VehicleInsight</p>
+            <h1>Vehicle Search</h1>
+            <p class="lede">Search NHTSA vehicle data by make and manufacture year.</p>
+        </section>
+
+        <section class="search-panel" aria-labelledby="search-heading">
+            <div class="section-heading">
+                <h2 id="search-heading">Search Criteria</h2>
+                <span id="makes-status" class="status-text" role="status">Loading makes...</span>
+            </div>
+
+            <form id="vehicle-search-form" novalidate>
+                <div class="form-grid">
+                    <label class="field">
+                        <span>Vehicle Make</span>
+                        <select id="make-select" name="makeId" disabled>
+                            <option value="">Loading vehicle makes...</option>
+                        </select>
+                    </label>
+
+                    <label class="field">
+                        <span>Manufacture Year</span>
+                        <input id="year-input" name="year" type="number" inputmode="numeric" min="1900" placeholder="2015">
+                    </label>
+
+                    <button id="search-button" type="submit" disabled>Search</button>
+                </div>
+            </form>
+
+            <div id="message" class="message" hidden></div>
+        </section>
+
+        <section class="results-grid" aria-live="polite">
+            <section class="result-section" aria-labelledby="types-heading">
+                <div class="section-heading">
+                    <h2 id="types-heading">Vehicle Types</h2>
+                    <span id="types-count" class="count">0</span>
+                </div>
+                <div id="vehicle-types" class="result-list empty-state">Run a search to view vehicle types.</div>
+            </section>
+
+            <section class="result-section" aria-labelledby="models-heading">
+                <div class="section-heading">
+                    <h2 id="models-heading">Models</h2>
+                    <span id="models-count" class="count">0</span>
+                </div>
+                <div id="vehicle-models" class="result-list empty-state">Run a search to view models.</div>
+            </section>
+        </section>
+    </main>
+
+    <script src="/js/app.js"></script>
+</body>
+</html>
