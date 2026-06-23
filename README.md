@@ -2,6 +2,10 @@
 
 VehicleInsight is a .NET 8 web application for searching vehicle information from the official NHTSA VPIC API. It provides a simple responsive UI plus API endpoints for vehicle makes, vehicle types, and models by make/year.
 
+## Live Demo
+
+http://13.51.175.53
+
 ## Features
 
 - Clean Architecture solution structure.
@@ -182,4 +186,8 @@ Recommended commit flow for this assignment:
 
 AWS EC2 deployment instructions are available in [docs/deployment-aws-ec2.md](docs/deployment-aws-ec2.md).
 
-No AWS infrastructure resources or automated deployment configuration are included yet.
+Deployment notes:
+
+- Hosted on AWS EC2 Free Tier.
+- Dockerized and running on Ubuntu EC2.
+- Live Demo: http://13.51.175.53
