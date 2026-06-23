@@ -6,7 +6,7 @@ VehicleInsight is a .NET 8 web application for searching vehicle information fro
 
 http://13.51.175.53
 
-The deployed application is publicly available at `http://13.51.175.53`. The production EC2 instance serves the app on port `80`; local Docker instructions use port `8080`.
+The deployed application is publicly available at `http://13.51.175.53`. The production EC2 instance exposes the app on public HTTP port `80`; local Docker instructions use port `8080`.
 
 ## Features
 
@@ -211,4 +211,6 @@ Deployment notes:
 
 - Hosted on AWS EC2 Free Tier.
 - Dockerized and running on Ubuntu EC2.
+- Public HTTP port: `80`.
+- Container port: `8080`.
 - Public URL: http://13.51.175.53

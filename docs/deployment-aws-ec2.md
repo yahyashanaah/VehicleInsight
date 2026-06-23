@@ -6,9 +6,13 @@ This guide explains how to deploy VehicleInsight to an Ubuntu EC2 free tier inst
 
 - AWS EC2 instance: Ubuntu Server, free tier eligible
 - Instance type: `t2.micro` or `t3.micro`, depending on free tier availability in your AWS account/region
-- App port: `8080`
+- Public app port: `80`
+- Container app port: `8080`
 - Runtime: Docker Compose
-- App URL format: `http://<ec2-public-ip>:8080`
+- Current live URL: `http://13.51.175.53`
+- App URL format: `http://<ec2-public-ip>`
+
+The application container listens on port `8080`. The current AWS deployment exposes it publicly on standard HTTP port `80`, so users can open the app without adding `:8080` to the URL.
 
 ## 1. Create An EC2 Instance
 
@@ -25,19 +29,20 @@ This guide explains how to deploy VehicleInsight to an Ubuntu EC2 free tier inst
 
 ## 2. Configure The Security Group
 
-The EC2 security group must allow SSH for administration and port `8080` for the app.
+The EC2 security group must allow SSH for administration and HTTP port `80` for the public app.
 
 Recommended inbound rules:
 
 | Type | Protocol | Port | Source | Purpose |
 | --- | --- | --- | --- | --- |
 | SSH | TCP | 22 | Your IP address | Connect to the instance |
-| Custom TCP | TCP | 8080 | `0.0.0.0/0` | Access VehicleInsight |
+| HTTP | TCP | 80 | `0.0.0.0/0` | Access VehicleInsight |
 
 Notes:
 
 - For SSH, prefer `My IP` instead of opening port `22` to the world.
-- For an assignment/demo app, opening `8080` to `0.0.0.0/0` is acceptable. For production, restrict access or put the app behind a load balancer/reverse proxy.
+- The live app is publicly available at `http://13.51.175.53` on port `80`.
+- The container still listens on port `8080`; the EC2 host maps public port `80` to container port `8080`.
 - Outbound traffic can remain at the default setting so the instance can pull Docker packages and call the NHTSA VPIC API.
 
 ## 3. Connect To The Instance
@@ -136,11 +141,15 @@ Check container status:
 docker compose ps
 ```
 
-The app should show port mapping similar to:
+For the current live AWS deployment, the app is exposed publicly on port `80` and forwarded to container port `8080`. The container port remains `8080`; the public URL is standard HTTP.
+
+The EC2 deployment should show a port mapping similar to:
 
 ```text
-0.0.0.0:8080->8080/tcp
+0.0.0.0:80->8080/tcp
 ```
+
+If your EC2 instance shows `0.0.0.0:8080->8080/tcp`, the app will be available at `http://<ec2-public-ip>:8080` instead. Update the EC2 deployment port mapping to `80:8080` to match the current live URL.
 
 ## 7. Verify The App Is Running
 
@@ -158,15 +167,18 @@ Healthy
 
 From your browser:
 
-- UI: `http://<ec2-public-ip>:8080`
-- Swagger: `http://<ec2-public-ip>:8080/swagger`
+- UI: `http://<ec2-public-ip>`
+- Current live UI: `http://13.51.175.53`
+
+Swagger is intended for local/Docker development URLs. The current public EC2 URL serves the UI and API but does not expose Swagger publicly.
 
 If the browser cannot connect:
 
 1. Confirm the container is running with `docker compose ps`.
-2. Confirm the security group allows inbound TCP `8080`.
+2. Confirm the security group allows inbound HTTP TCP `80`.
 3. Confirm you are using the instance public IPv4 address.
-4. Check logs with the commands below.
+4. Confirm the host maps public port `80` to container port `8080`.
+5. Check logs with the commands below.
 
 ## 8. View Logs
 
