@@ -1,24 +1,54 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using VehicleInsight.Application.Common.Interfaces;
 using VehicleInsight.Application.DTOs;
 
 namespace VehicleInsight.Infrastructure.ExternalApis.Nhtsa;
 
-public sealed class NhtsaVehicleService(HttpClient httpClient) : INhtsaVehicleService
+public sealed class NhtsaVehicleService(
+    HttpClient httpClient,
+    IMemoryCache memoryCache,
+    ILogger<NhtsaVehicleService> logger) : INhtsaVehicleService
 {
+    private const string VehicleMakesCacheKey = "vehicle-makes";
+    private static readonly TimeSpan VehicleMakesCacheDuration = TimeSpan.FromHours(24);
     private static readonly JsonSerializerOptions JsonSerializerOptions = new(JsonSerializerDefaults.Web);
 
     public async Task<IReadOnlyList<VehicleMakeDto>> GetAllMakesAsync(CancellationToken cancellationToken)
     {
+        if (memoryCache.TryGetValue(VehicleMakesCacheKey, out IReadOnlyList<VehicleMakeDto>? cachedMakes) &&
+            cachedMakes is not null)
+        {
+            logger.LogInformation(
+                "Vehicle makes returned from cache. CacheKey: {CacheKey}, Count: {Count}",
+                VehicleMakesCacheKey,
+                cachedMakes.Count);
+
+            return cachedMakes;
+        }
+
+        logger.LogInformation("Fetching vehicle makes from NHTSA API. CacheKey: {CacheKey}", VehicleMakesCacheKey);
+
         var response = await GetFromNhtsaAsync<NhtsaResponse<NhtsaMake>>(
             "api/vehicles/getallmakes?format=json",
             cancellationToken);
 
-        return response.Results?
+        var makes = response.Results?
             .Select(make => new VehicleMakeDto(make.MakeId, make.MakeName ?? string.Empty))
             .ToArray() ?? [];
+
+        memoryCache.Set(VehicleMakesCacheKey, makes, VehicleMakesCacheDuration);
+
+        logger.LogInformation(
+            "Vehicle makes fetched from NHTSA API and cached. CacheKey: {CacheKey}, Count: {Count}, CacheDurationHours: {CacheDurationHours}",
+            VehicleMakesCacheKey,
+            makes.Length,
+            VehicleMakesCacheDuration.TotalHours);
+
+        return makes;
     }
 
     public async Task<IReadOnlyList<VehicleTypeDto>> GetVehicleTypesForMakeAsync(int makeId, CancellationToken cancellationToken)
@@ -58,24 +88,42 @@ public sealed class NhtsaVehicleService(HttpClient httpClient) : INhtsaVehicleSe
 
             if (!response.IsSuccessStatusCode)
             {
+                logger.LogError(
+                    "NHTSA API request failed. RequestUri: {RequestUri}, StatusCode: {StatusCode}",
+                    requestUri,
+                    (int)response.StatusCode);
+
                 throw new InvalidOperationException(
                     $"NHTSA API request failed with status code {(int)response.StatusCode}.");
             }
 
             var data = await response.Content.ReadFromJsonAsync<TResponse>(JsonSerializerOptions, cancellationToken);
 
-            return data ?? throw new InvalidOperationException("NHTSA API returned an empty response.");
+            if (data is null)
+            {
+                logger.LogError("NHTSA API returned an empty response. RequestUri: {RequestUri}", requestUri);
+
+                throw new InvalidOperationException("NHTSA API returned an empty response.");
+            }
+
+            return data;
         }
         catch (HttpRequestException exception)
         {
+            logger.LogError(exception, "NHTSA API request failed. RequestUri: {RequestUri}", requestUri);
+
             throw new InvalidOperationException("NHTSA API request failed.", exception);
         }
         catch (TaskCanceledException exception) when (!cancellationToken.IsCancellationRequested)
         {
+            logger.LogError(exception, "NHTSA API request timed out. RequestUri: {RequestUri}", requestUri);
+
             throw new InvalidOperationException("NHTSA API request timed out.", exception);
         }
         catch (JsonException exception)
         {
+            logger.LogError(exception, "NHTSA API response could not be parsed. RequestUri: {RequestUri}", requestUri);
+
             throw new InvalidOperationException("NHTSA API response could not be parsed.", exception);
         }
     }
